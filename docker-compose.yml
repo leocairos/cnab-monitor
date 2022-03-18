@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  node:
+    container_name: cnab-monitor
+    image: node:14
+    ports:
+      - '3305:3305'
+    volumes:
+      - ./:/srv/app
+    working_dir: /srv/app
+    command: bash -c
+      'npm install && npm start'

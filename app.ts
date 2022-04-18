@@ -10,18 +10,31 @@ const PATH_FILES = process.env.PATH_FILES;
 const directoryPath = path.resolve(__dirname, PATH_FILES);
 const idsFilter = `${process.env.IDS_FILTER}`.split(';');
 
-const readInterval = 1000 * 60 * Number(process.env.READ_FILES_INTERVAL);
+const readInterval = 1000 * 10 * Number(process.env.READ_FILES_INTERVAL);
 
 let isReading = false;
 
 const app = express();
 const results = [];
 
+function myDate(dateString: string): Date{ 
+  const dateParts = dateString.split("/");
+  return new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]); 
+}
+
 const msgLog = `Service running on port '${appPort}' (${process.env.NODE_ENV})
     Read from ${directoryPath} every ${readInterval / 1000 / 60} minutes.`;
 
 app.get('/', (req: Request, res: Response) => {
-  return res.json({ status: msgLog, filteredIds: idsFilter, results });
+  const resultsOrdered = [...results]
+  resultsOrdered.sort(function (a, b) {
+    const dateA = myDate(a.date);
+    const dateB = myDate(b.date);
+    if (dateA > dateB) return 1;
+    if (dateA < dateB) return -1;
+    return 0;
+  });
+  return res.json({ status: msgLog, filteredIds: idsFilter, resultsOrdered });
 }
 );
 

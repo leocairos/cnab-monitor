@@ -16,6 +16,9 @@ let isReading = false;
 
 const app = express();
 const results = [];
+const employeesTotal = {};
+
+idsFilter.forEach(id => employeesTotal[id] = 0)
 
 function myDate(dateString: string): Date{ 
   const dateParts = dateString.split("/");
@@ -34,7 +37,7 @@ app.get('/', (req: Request, res: Response) => {
     if (dateA < dateB) return -1;
     return 0;
   });
-  return res.json({ status: msgLog, filteredIds: idsFilter, resultsOrdered });
+  return res.json({ status: msgLog, filteredIds: idsFilter, resultsOrdered, employeesTotal });
 }
 );
 
@@ -64,6 +67,7 @@ async function readFileByLine(file: string) {
         name = line.substring(82, 120).trim();
         firstName = name.split(" ")[0];
         value = Number(line.substring(126, 139).trim()) / 100;
+        employeesTotal[id] += value;
         const newResult = {
           file,
           date: `${date1.substring(0, 2)}/${date1.substring(2, 4)}/${date1.substring(4, 8)}`,
